@@ -1,0 +1,30 @@
+{
+  "model": "HuggingFaceTB/SmolLM2-135M",
+  "dataset": "HuggingFaceTB/smoltalk",
+  "dataset_config": "everyday-conversations",
+  "train_examples": 2260,
+  "test_examples": 119,
+  "full": {
+    "trainable_parameters": 134515008,
+    "learning_rate": 5e-5,
+    "batch_size": 4,
+    "epochs": 3,
+    "max_length": 512,
+    "train_loss": [0.9240619099245663, 0.6788897126649334, 0.516164902828436],
+    "test_loss": 0.8831
+  },
+  "lora": {
+    "trainable_parameters": 921600,
+    "rank": 8,
+    "alpha": 16,
+    "scaling": 2.0,
+    "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
+    "learning_rate": 0.0001,
+    "batch_size": 1,
+    "epochs": 3,
+    "max_length": 512,
+    "train_loss": [1.0823276220697218, 0.9732283169584992, 0.9202206868249758],
+    "test_loss": 1.0451,
+    "reloaded_adapter_test_loss": 1.0451
+  }
+}
