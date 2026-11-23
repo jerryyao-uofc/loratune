@@ -9,7 +9,7 @@ The numbers and transcripts are from one finished run. They live in [`results/me
 After this page you should be able to:
 
 - Write a fine-tune as $W' = W + \Delta W$, and say what is frozen.
-- Explain $\operatorname{rank}(\Delta W)$ as the number of independent directions that update is allowed to move in.
+- Explain $\mathrm{rank}(\Delta W)$ as the number of independent directions that update is allowed to move in.
 - Build $\Delta W$ from $A$ and $B$, including the shapes, the scale $\alpha / r$, and why $B = 0$ at the start.
 - Read a test loss and a set of generated replies as two different checks on the same model.
 
@@ -53,10 +53,10 @@ BA =
 \end{bmatrix}.
 $$
 
-Every column of $BA$ is a multiple of $(1, 0, -1, 2)^\top$. The matrix has one independent column, so $\operatorname{rank}(BA) = 1$. That is the largest rank a product $BA$ can have when the inner dimension is $1$. In general,
+Every column of $BA$ is a multiple of $(1, 0, -1, 2)^\top$. The matrix has one independent column, so $\mathrm{rank}(BA) = 1$. That is the largest rank a product $BA$ can have when the inner dimension is $1$. In general,
 
 $$
-\operatorname{rank}(BA) \le r.
+\mathrm{rank}(BA) \le r.
 $$
 
 In the forward pass this is easier to see:
@@ -87,7 +87,7 @@ $$
 Two readings of "the update is low-rank" are easy to mix up.
 
 1. Measured after the fact. Fine-tune all of $W$, then look at $\Delta W = W_{\mathrm{finetuned}} - W_{\mathrm{pretrained}}$. Sometimes that difference is close to a rank-$8$ or rank-$16$ matrix: a few singular directions hold the energy. Sometimes it is not. This is an observation about one model and one task.
-2. Enforced while training. Never form a full $\Delta W$. Store and train only $A$ and $B$, so every step already satisfies $\operatorname{rank}(\Delta W) \le r$. This is what LoRA does. The claim is practical: training inside that thin family often reaches nearly the same task loss as updating every entry.
+2. Enforced while training. Never form a full $\Delta W$. Store and train only $A$ and $B$, so every step already satisfies $\mathrm{rank}(\Delta W) \le r$. This is what LoRA does. The claim is practical: training inside that thin family often reaches nearly the same task loss as updating every entry.
 
 This project does both. The rank plot is reading 1, applied to the full fine-tune. The adapter run is reading 2.
 
