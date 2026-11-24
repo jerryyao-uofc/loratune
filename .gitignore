@@ -9,5 +9,8 @@ hf_token
 outputs/
 checkpoints/
 *.pt
+*.safetensors
+results/four_methods_bundle/adapters/
+results/four_methods_bundle.zip
 .DS_Store
 .ipynb_checkpoints/

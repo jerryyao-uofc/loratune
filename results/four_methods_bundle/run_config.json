@@ -1,0 +1,74 @@
+{
+  "model": "HuggingFaceTB/SmolLM2-135M",
+  "dataset": "HuggingFaceTB/smoltalk/everyday-conversations",
+  "learning_rate": 0.0001,
+  "epochs": 3,
+  "batch_size": 1,
+  "max_length": 512,
+  "max_new_tokens": 50,
+  "methods": {
+    "original_lora": {
+      "label": "Original LoRA",
+      "r": 8,
+      "alpha": 16,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj"
+      ],
+      "use_rslora": false,
+      "load_in_4bit": false,
+      "what_changed": "attention only, r=8, scale alpha/r, float base"
+    },
+    "qlora": {
+      "label": "QLoRA",
+      "r": 8,
+      "alpha": 16,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj"
+      ],
+      "use_rslora": false,
+      "load_in_4bit": true,
+      "what_changed": "same adapter as original, 4-bit NF4 frozen base"
+    },
+    "all_linear": {
+      "label": "LoRA on all linear layers",
+      "r": 16,
+      "alpha": 16,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj"
+      ],
+      "use_rslora": false,
+      "load_in_4bit": false,
+      "what_changed": "all linear layers, r=16, scale alpha/r"
+    },
+    "rslora": {
+      "label": "rsLoRA",
+      "r": 16,
+      "alpha": 16,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj"
+      ],
+      "use_rslora": true,
+      "load_in_4bit": false,
+      "what_changed": "same layers/rank as all_linear, scale alpha/sqrt(r)"
+    }
+  },
+  "seed": 42
+}

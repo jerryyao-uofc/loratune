@@ -1,0 +1,62 @@
+[
+  {
+    "prompt_id": 0,
+    "prompt": "Explain photosynthesis in one sentence.",
+    "full_decode": "<|im_start|><|user|>: Explain photosynthesis in one sentence.<|im_end|>\n\n<|im_start|><|assistant|>: 1. Photosynthesis is the process by which plants make their own food. 2. Plants use sunlight to make their own food through a process called photosynthesis.<|im_end|>\n\n<|im_start|><|assistant|>: 3. Plants use sunlight to make",
+    "first_assistant_span": "1. Photosynthesis is the process by which plants make their own food. 2. Plants use sunlight to make their own food through a process called photosynthesis."
+  },
+  {
+    "prompt_id": 1,
+    "prompt": "Give me a simple pasta recipe for two people.",
+    "full_decode": "<|im_start|><|user|>: Give me a simple pasta recipe for two people.<|im_end|>\n\n<|im_start|><|assistant|>: 1/2 cup pasta sauce, 1/2 cup grated Parmesan cheese, 1/2 cup chopped fresh basil, 1/2 cup chopped fresh mint, 1/2 cup chopped red onion, 1/2",
+    "first_assistant_span": "1/2 cup pasta sauce, 1/2 cup grated Parmesan cheese, 1/2 cup chopped fresh basil, 1/2 cup chopped fresh mint, 1/2 cup chopped red onion, 1/2"
+  },
+  {
+    "prompt_id": 2,
+    "prompt": "How do I apologize to a friend after forgetting their birthday?",
+    "full_decode": "<|im_start|><|user|>: How do I apologize to a friend after forgetting their birthday?<|im_end|>\n\n<|im_start|><|assistant|>: 1. You can say \"I'm sorry I forgot your birthday\" or \"I'm so sorry I forgot your birthday\" or \"I'm so sorry I forgot your birthday\" or \"I'm so sorry I forgot your birthday\" or \"I",
+    "first_assistant_span": "1. You can say \"I'm sorry I forgot your birthday\" or \"I'm so sorry I forgot your birthday\" or \"I'm so sorry I forgot your birthday\" or \"I'm so sorry I forgot your birthday\" or \"I"
+  },
+  {
+    "prompt_id": 3,
+    "prompt": "What should I pack for a weekend hike?",
+    "full_decode": "<|im_start|><|user|>: What should I pack for a weekend hike?<|im_end|>\n\n<|im_start|><|assistant|>: 1.5-2 days of hiking, 2-3 days of rest, and 2-3 days of rest. You should pack a backpack with a full load of essentials like water, snacks, and a first aid kit.<|im_end|>\n\n",
+    "first_assistant_span": "1.5-2 days of hiking, 2-3 days of rest, and 2-3 days of rest. You should pack a backpack with a full load of essentials like water, snacks, and a first aid kit."
+  },
+  {
+    "prompt_id": 4,
+    "prompt": "Recommend a movie if I liked Inception.",
+    "full_decode": "<|im_start|><|user|>: Recommend a movie if I liked Inception.<|im_end|>\n\n<|im_start|><|assistant|>: 1. Inception is a movie that's been in theaters for a while. It's a sci-fi adventure film.<|im_end|>\n\n<|im_start|><|assistant|>: 2. It's a great movie. It's a great story.",
+    "first_assistant_span": "1. Inception is a movie that's been in theaters for a while. It's a sci-fi adventure film."
+  },
+  {
+    "prompt_id": 5,
+    "prompt": "Help me write a short out-of-office email.",
+    "full_decode": "<|im_start|><|user|>: Help me write a short out-of-office email.<|im_end|>\n\n<|im_start|><|assistant|>: 1. I'm a bit confused about the difference between a letter and a letter of the alphabet. What's the difference?<|im_end|>\n\n<|im_start|><|assistant|>: A letter is a short, formal letter that you send to someone you know",
+    "first_assistant_span": "1. I'm a bit confused about the difference between a letter and a letter of the alphabet. What's the difference?"
+  },
+  {
+    "prompt_id": 6,
+    "prompt": "What is a good way to fall asleep faster?",
+    "full_decode": "<|im_start|><|user|>: What is a good way to fall asleep faster?<|im_end|>\n\n<|im_start|><|assistant|>: 1.5-30 minutes of deep sleep is ideal for falling asleep. 2.5-60 minutes of deep sleep is ideal for waking up refreshed. 3.5-90 minutes of deep sleep is ideal for waking up",
+    "first_assistant_span": "1.5-30 minutes of deep sleep is ideal for falling asleep. 2.5-60 minutes of deep sleep is ideal for waking up refreshed. 3.5-90 minutes of deep sleep is ideal for waking up"
+  },
+  {
+    "prompt_id": 7,
+    "prompt": "Explain the offside rule in soccer.",
+    "full_decode": "<|im_start|><|user|>: Explain the offside rule in soccer.<|im_end|>\n\n<|im_start|><|assistant|>: 1. Offside is when a player is in the other team's half of the field, and they are not in the other team's half of the field. 2. The offside rule is used to prevent the other team from scoring.",
+    "first_assistant_span": "1. Offside is when a player is in the other team's half of the field, and they are not in the other team's half of the field. 2. The offside rule is used to prevent the other team from scoring."
+  },
+  {
+    "prompt_id": 8,
+    "prompt": "Suggest a weeknight dinner that uses chicken and rice.",
+    "full_decode": "<|im_start|><|user|>: Suggest a weeknight dinner that uses chicken and rice.<|im_end|>\n\n<|im_start|><|assistant|>: 1. Chicken and rice is a popular choice for weeknight dinners. It's easy to make and can be served with a variety of side dishes.<|im_end|>\n\n<|im_start|><|assistant|>: 2. Chicken and rice is a versatile",
+    "first_assistant_span": "1. Chicken and rice is a popular choice for weeknight dinners. It's easy to make and can be served with a variety of side dishes."
+  },
+  {
+    "prompt_id": 9,
+    "prompt": "How can I politely decline a party invitation?",
+    "full_decode": "<|im_start|><|user|>: How can I politely decline a party invitation?<|im_end|>\n\n<|im_start|><|assistant|>: 1. You can decline a party invitation by saying \"I'm not sure\" or \"I don't know\" or \"I don't know what to do.\" 2. You can also decline by saying \"I'm not sure\" or \"",
+    "first_assistant_span": "1. You can decline a party invitation by saying \"I'm not sure\" or \"I don't know\" or \"I don't know what to do.\" 2. You can also decline by saying \"I'm not sure\" or \""
+  }
+]

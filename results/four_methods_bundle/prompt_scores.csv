@@ -1,0 +1,5 @@
+method,prompts_addressed,prompts_total,note
+original_lora,6,10,"Photosynthesis, apology, hike pack list, OOO writing tips, sleep tip, and decline are on topic. Pasta echoes the prompt, Inception never names another film, offside is wrong, chicken-and-rice is vague."
+qlora,4,10,"Photosynthesis, apology phrases, sleep, and decline land on topic. Hike, pasta, movie, OOO, offside, and chicken miss or drift."
+all_linear,6,10,"Photosynthesis, apology, hike, sleep, chicken-and-rice, and decline are on topic. Pasta water list, Inception loop, OOO meta-instructions, and wrong offside miss."
+rslora,6,10,"Photosynthesis, pasta ingredients, apology, hike pack list, chicken-and-rice, and decline are on topic. Inception, OOO, sleep durations, and offside miss."
