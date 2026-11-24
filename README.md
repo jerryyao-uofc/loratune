@@ -24,9 +24,9 @@ $$
 y = W_{\mathrm{base}} x + s\, (x A^{\top}) B^{\top}.
 $$
 
-That factorization is the whole point: instead of a dense $d_{\mathrm{out}} \times d_{\mathrm{in}}$ update, you store and train two thin matrices whose product has at most rank $r$.
+That factorization is the whole point: instead of a dense $`d_{\mathrm{out}} \times d_{\mathrm{in}}`$ update, you store and train two thin matrices whose product has at most rank $r$.
 
-Why is a low-rank update plausible at all? After a full fine-tune, form $\Delta W = W_{\mathrm{base}} - W_{\mathrm{full}}$. The leftover of the best rank-$r$ approximation is
+Why is a low-rank update plausible at all? After a full fine-tune, form $`\Delta W = W_{\mathrm{base}} - W_{\mathrm{full}}`$. The leftover of the best approximation of rank $r$ is
 
 $$
 \| \Delta W - \Delta W_r \|_F = \sqrt{\sum_{i > r} \sigma_i^2}.
@@ -46,14 +46,14 @@ Test loss is the mean of $L$ over the 119 held-out conversations, each scored al
 
 ## Comparing the four recipes
 
-The four recipes share the same $BA$ math. They differ in **how $W$ is stored**, **which layers get $A$ and $B$**, **what rank $r$ is**, and **how the scale $s$ is defined**.
+The four recipes share the same $BA$ math. They differ in how $W$ is stored, which layers get $A$ and $B$, what rank $r$ is, and how the scale $s$ is defined.
 
 | Method | Idea in one line | This run |
 | --- | --- | --- |
-| **Classic LoRA** | Low-rank adapters on attention only | $r = 8$, $\alpha = 16$, $s = \alpha/r$, targets `q,k,v,o`, float $W$ |
+| **Classic LoRA** | Low-rank adapters on attention only | $`r = 8`$, $`\alpha = 16`$, $`s = \alpha/r`$, targets `q,k,v,o`, float $W$ |
 | **QLoRA** | Same adapters, 4-bit frozen base | Same adapter as classic; NF4 + double quant for $W$ |
-| **All-linear LoRA** | Adapters on every linear layer in the block | $r = 16$, $\alpha = 16$, $s = \alpha/r$, attention + MLP |
-| **rsLoRA** | Rank-stabilized scale on that wider adapter | Same layers and rank as all-linear; $s = \alpha/\sqrt{r}$ |
+| **All-linear LoRA** | Adapters on every linear layer in the block | $`r = 16`$, $`\alpha = 16`$, $`s = \alpha/r`$, attention + MLP |
+| **rsLoRA** | Rank-stabilized scale on that wider adapter | Same layers and rank as all-linear; $`s = \alpha/\sqrt{r}`$ |
 
 ```mermaid
 flowchart LR
@@ -68,7 +68,7 @@ flowchart LR
 
 ### Classic LoRA
 
-Hu et al. write the task update as a product of two thin matrices and train only those matrices. In the original paper the usual place to attach them is attention. This run follows that pattern: wrap `q_proj`, `k_proj`, `v_proj`, and `o_proj` in every layer, leave the MLP frozen, use $r = 8$ and $s = \alpha / r = 2$. Trainable count: **921,600** parameters—about 0.7% of the **134,515,008** weights a full fine-tune would update.
+Hu et al. write the task update as a product of two thin matrices and train only those matrices. In the original paper the usual place to attach them is attention. This run follows that pattern: wrap `q_proj`, `k_proj`, `v_proj`, and `o_proj` in every layer, leave the MLP frozen, use $`r = 8`$ and $`s = \alpha / r = 2`$. Trainable count: **921,600** parameters—about 0.7% of the **134,515,008** weights a full fine-tune would update.
 
 This is the baseline. The other three runs each change one design choice relative to a neighbor in the diagram above.
 
@@ -76,7 +76,7 @@ This is the baseline. The other three runs each change one design choice relativ
 
 Dettmers et al. keep the same LoRA math and change how the frozen base is stored. $W$ lives in 4-bit NormalFloat (NF4), often with double quantization. Gradients still flow into $A$ and $B$ in higher precision. The point is memory: a 7B or 70B model that will not fit in float16 can still take an adapter.
 
-This run keeps the **exact classic adapter** (attention only, $r = 8$, $\alpha = 16$, $s = \alpha/r$) and only switches the base to NF4. Any gap versus classic LoRA is the cost of quantization, not a change in rank or targets.
+This run keeps the **exact classic adapter** (attention only, $`r = 8`$, $`\alpha = 16`$, $`s = \alpha/r`$) and only switches the base to NF4. Any gap versus classic LoRA is the cost of quantization, not a change in rank or targets.
 
 ### All-linear LoRA
 
@@ -84,17 +84,17 @@ This is still LoRA. Hugging Face PEFT exposes it as `target_modules="all-linear"
 
 `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj`.
 
-Production configs often combine that target list with a modest rank such as 16. This run uses $r = 16$, $\alpha = 16$, and $s = \alpha / r = 1$. Trainable count: **4,884,480** parameters. Compared with classic LoRA, both the **layers** and the **rank** change, so the gap is the whole recipe, not a single knob.
+Production configs often combine that target list with a modest rank such as 16. This run uses $`r = 16`$, $`\alpha = 16`$, and $`s = \alpha / r = 1`$. Trainable count: **4,884,480** parameters. Compared with classic LoRA, both the **layers** and the **rank** change, so the gap is the whole recipe, not a single knob.
 
 ### rsLoRA
 
-Kalajdzievski argues that $s = \alpha / r$ shrinks the update as rank grows, which can hide the benefit of a larger $r$. Rank-stabilized LoRA sets
+Kalajdzievski argues that $`s = \alpha / r`$ shrinks the update as rank grows, which can hide the benefit of a larger $r$. Rank-stabilized LoRA sets
 
 $$
 s = \frac{\alpha}{\sqrt{r}}.
 $$
 
-At $r = 16$ and $\alpha = 16$, classic scaling gives $s = 1$ and rsLoRA gives $s = 4$. This run keeps the all-linear target list and $r = 16$, and only flips the scale (PEFT `use_rslora=True`). Any gap versus all-linear LoRA is the scale alone.
+At $`r = 16`$ and $`\alpha = 16`$, classic scaling gives $`s = 1`$ and rsLoRA gives $`s = 4`$. This run keeps the all-linear target list and $`r = 16`$, and only flips the scale (PEFT `use_rslora=True`). Any gap versus all-linear LoRA is the scale alone.
 
 ## Shared training setup
 
@@ -102,7 +102,7 @@ At $r = 16$ and $\alpha = 16$, classic scaling gives $s = 1$ and rsLoRA gives $s
 | --- | --- |
 | Base model | SmolLM2-135M |
 | Dataset | SmolTalk `everyday-conversations` (instruction / chat) |
-| Optimizer | AdamW, $\eta = 10^{-4}$ |
+| Optimizer | AdamW, $`\eta = 10^{-4}`$ |
 | Batch size | 1 |
 | Epochs | 3 |
 | Max length | 512 |
@@ -138,13 +138,13 @@ Do not rank the four methods with one number. Read them as three pairs.
 ![Three pairwise test-loss gaps](assets/four_methods/05_pairwise_deltas.png)
 
 **Classic LoRA versus QLoRA (quantization).**  
-Same adapter. Test loss rises from 1.041 to 1.091 ($\Delta = +0.050$). Prompts addressed fall from 6 / 10 to 4 / 10. Frozen weight memory falls from about 517 MB to about 39 MB. Training time roughly triples (20 min → 56 min) on this GPU, which is the bitsandbytes path paying for dequantization during the forward/backward. On this 135M model the memory win is large and the quality tax is clear—exactly the QLoRA trade in miniature. For a model that already fits in float, classic LoRA is the better default; for a model that does not, QLoRA is the reason the run can happen at all.
+Same adapter. Test loss rises from 1.041 to 1.091 ($`\Delta = +0.050`$). Prompts addressed fall from 6 / 10 to 4 / 10. Frozen weight memory falls from about 517 MB to about 39 MB. Training time roughly triples (20 min → 56 min) on this GPU, which is the bitsandbytes path paying for dequantization during the forward/backward. On this 135M model the memory win is large and the quality tax is clear—exactly the QLoRA trade in miniature. For a model that already fits in float, classic LoRA is the better default; for a model that does not, QLoRA is the reason the run can happen at all.
 
 **Classic LoRA versus all-linear LoRA (targets and rank).**  
-Attention-only rank 8 against every linear layer at rank 16. Test loss falls from 1.041 to 0.991 ($\Delta = -0.050$). Prompt count stays 6 / 10. Trainable parameters grow from 0.92M to 4.88M, and wall-clock rises only modestly (20 → 26 min). The wider recipe fits the reference chats better; the small prompt suite does not separate them by count, but the *which* prompts succeed does shift (see below). Treat this gap as a whole-recipe change: both coverage and rank moved together.
+Attention-only rank 8 against every linear layer at rank 16. Test loss falls from 1.041 to 0.991 ($`\Delta = -0.050`$). Prompt count stays 6 / 10. Trainable parameters grow from 0.92M to 4.88M, and wall-clock rises only modestly (20 → 26 min). The wider recipe fits the reference chats better; the small prompt suite does not separate them by count, but the *which* prompts succeed does shift (see below). Treat this gap as a whole-recipe change: both coverage and rank moved together.
 
 **All-linear LoRA versus rsLoRA (scale).**  
-Same layers, same rank, same $\alpha$. Test loss falls from 0.991 to 0.970 ($\Delta = -0.021$). Prompt count stays 6 / 10. Final training loss falls from 0.934 to 0.853. At $r = 16$, $\alpha/\sqrt{r}$ uses the extra capacity more effectively than $\alpha/r$. That is a cheap win: no extra parameters, no extra layers—only a different multiplier on the same $BA$ product.
+Same layers, same rank, same $\alpha$. Test loss falls from 0.991 to 0.970 ($`\Delta = -0.021`$). Prompt count stays 6 / 10. Final training loss falls from 0.934 to 0.853. At $`r = 16`$, $`\alpha/\sqrt{r}`$ uses the extra capacity more effectively than $`\alpha/r`$. That is a cheap win: no extra parameters, no extra layers—only a different multiplier on the same $BA$ product.
 
 ![Quality against adapter size](assets/four_methods/02_params_vs_loss.png)
 
