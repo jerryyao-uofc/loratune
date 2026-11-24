@@ -11,6 +11,9 @@ checkpoints/
 *.pt
 *.safetensors
 results/four_methods_bundle/adapters/
+results/four_methods_bundle/figures/
 results/four_methods_bundle.zip
+.mplconfig/
 .DS_Store
 .ipynb_checkpoints/
+.mplconfig/

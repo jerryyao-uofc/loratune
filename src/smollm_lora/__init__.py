@@ -1,4 +1,4 @@
-"""Instruction fine-tuning SmolLM2 with a from-scratch LoRA adapter."""
+"""Instruction fine-tuning SmolLM2 with LoRA adapters (from-scratch and PEFT)."""
 
 from smollm_lora.lora import LoRALinear, count_trainable_parameters
 from smollm_lora.template import apply_chat_template

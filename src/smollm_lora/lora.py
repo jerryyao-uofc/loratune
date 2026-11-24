@@ -10,7 +10,8 @@ import torch.nn as nn
 class LoRALinear(nn.Module):
     """Original linear layer plus a rank-r update.
 
-    The update is ``scaling * B @ A``, with ``scaling = alpha / r``.
+    The update is ``scaling * B @ A``. Classic LoRA uses ``scaling = alpha / r``.
+    Rank-stabilized LoRA (rsLoRA) uses ``scaling = alpha / sqrt(r)``.
     ``A`` starts random. ``B`` starts at zero, so the update starts at zero.
     """
 
@@ -21,12 +22,17 @@ class LoRALinear(nn.Module):
         out_features: int,
         r: int,
         alpha: int,
+        use_rslora: bool = False,
     ):
         super().__init__()
         self.base_layer = base_layer
         self.r = r
         self.alpha = alpha
-        self.scaling = self.alpha / self.r
+        self.use_rslora = use_rslora
+        if use_rslora:
+            self.scaling = self.alpha / (self.r ** 0.5)
+        else:
+            self.scaling = self.alpha / self.r
 
         weight_dtype = base_layer.weight.dtype
         weight_device = base_layer.weight.device
@@ -50,6 +56,7 @@ def replace_target_with_lora_layer(
     r: int,
     alpha: int,
     target_modules: Iterable[str] = ("q_proj", "k_proj", "v_proj", "o_proj"),
+    use_rslora: bool = False,
 ) -> None:
     """Replace each named linear layer with a LoRALinear that wraps it."""
     targets = set(target_modules)
@@ -66,6 +73,7 @@ def replace_target_with_lora_layer(
             module.out_features,
             r,
             alpha,
+            use_rslora=use_rslora,
         )
         setattr(parent_module, layer_name, lora_layer)
 
@@ -104,7 +112,15 @@ def load_adapters(model, adapter_path: str):
     return model
 
 
-def prepare_lora_model(model, rank: int, alpha: int, target_modules: List[str]):
-    replace_target_with_lora_layer(model, rank, alpha, target_modules)
+def prepare_lora_model(
+    model,
+    rank: int,
+    alpha: int,
+    target_modules: List[str],
+    use_rslora: bool = False,
+):
+    replace_target_with_lora_layer(
+        model, rank, alpha, target_modules, use_rslora=use_rslora
+    )
     set_requires_grad_for_lora(model)
     return model

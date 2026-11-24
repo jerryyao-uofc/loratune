@@ -4,3 +4,6 @@ datasets
 matplotlib
 pandas
 tqdm
+accelerate
+peft
+bitsandbytes

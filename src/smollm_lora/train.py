@@ -59,10 +59,11 @@ def train_lora(
     epochs,
     max_length,
     output_dir,
+    use_rslora: bool = False,
 ):
     """Freeze the base model and train the rank-r adapters."""
     device = pick_device()
-    prepare_lora_model(model, rank, alpha, target_modules)
+    prepare_lora_model(model, rank, alpha, target_modules, use_rslora=use_rslora)
     model.to(device)
     train_data = tokenize_train(dataset, tokenizer, max_length)
     loader = make_train_loader(train_data, 1, tokenizer.pad_token_id)
