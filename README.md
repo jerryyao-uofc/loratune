@@ -23,15 +23,15 @@ $$
 W' = W + \Delta W, \qquad y = (W + \Delta W)\, x.
 $$
 
-$W$ is the pretrained matrix. $\Delta W$ is the task-specific change. If every entry of $\Delta W$ is free, that is full-model fine-tuning. For a 135M model that is ${134{,}515{,}008}$ numbers, and most of them already know something useful.
+$W$ is the pretrained matrix. $\Delta W$ is the task-specific change. If every entry of $\Delta W$ is free, that is full-model fine-tuning. For a 135M model that is 134,515,008 numbers, and most of them already know something useful.
 
 Parameter-efficient fine-tuning keeps $W$ frozen and learns a smaller correction. LoRA is one way to do that. It bets that the useful correction lives in a few directions.
 
 ### Rank is the number of directions
 
-The rank of a matrix is how many independent columns it has. A rank-${1}$ matrix is one direction, copied at different scales. A rank-${2}$ matrix is a plane: every column is a mix of two directions.
+The rank of a matrix is how many independent columns it has. A rank-1 matrix is one direction, copied at different scales. A rank-2 matrix is a plane: every column is a mix of two directions.
 
-Take a ${4 \times 3}$ update, so ${3}$ input features can change ${4}$ outputs. A full update has ${12}$ free numbers. A rank-${1}$ update does not. Pick one output direction and one set of input weights:
+Take a 4 × 3 update, so 3 input features can change 4 outputs. A full update has 12 free numbers. A rank-1 update does not. Pick one output direction and one set of input weights:
 
 $$
 B =
@@ -53,7 +53,7 @@ BA =
 \end{bmatrix}.
 $$
 
-Every column of $BA$ is a multiple of $(1, 0, -1, 2)^\top$. The matrix has one independent column, so $\mathrm{rank}(BA) = 1$. That is the largest rank a product $BA$ can have when the inner dimension is ${1}$. In general,
+Every column of $BA$ is a multiple of $(1, 0, -1, 2)^\top$. The matrix has one independent column, so $\mathrm{rank}(BA) = 1$. That is the largest rank a product $BA$ can have when the inner dimension is 1. In general,
 
 $$
 \mathrm{rank}(BA) \le r.
@@ -68,7 +68,7 @@ $$
 - $Ax$ turns the input into $r$ numbers. Those numbers say how much of each learned direction this input should trigger.
 - $B$ turns those $r$ numbers into the output. The change always lies in the column space of $B$.
 
-With $r = 1$ and the matrices above, every input produces the same output shape, only larger or smaller. Output ${2}$ cannot move, because that row of $B$ is ${0}$, and output ${1}$ cannot rise while output ${4}$ falls, because they share one scale. With $r = 2$ the change can sit in a plane. Full fine-tuning can point anywhere in all $d_{\text{out}}$ dimensions.
+With $r = 1$ and the matrices above, every input produces the same output shape, only larger or smaller. Output 2 cannot move, because that row of $B$ is 0, and output 1 cannot rise while output 4 falls, because they share one scale. With $r = 2$ the change can sit in a plane. Full fine-tuning can point anywhere in all $d_{\mathrm{out}}$ dimensions.
 
 ### The LoRA factorization
 
@@ -86,7 +86,7 @@ $$
 
 Two readings of "the update is low-rank" are easy to mix up.
 
-1. Measured after the fact. Fine-tune all of $W$, then look at $\Delta W = W_{\mathrm{finetuned}} - W_{\mathrm{pretrained}}$. Sometimes that difference is close to a rank-${8}$ or rank-${16}$ matrix: a few singular directions hold the energy. Sometimes it is not. This is an observation about one model and one task.
+1. Measured after the fact. Fine-tune all of $W$, then look at $\Delta W = W_{\mathrm{finetuned}} - W_{\mathrm{pretrained}}$. Sometimes that difference is close to a rank-8 or rank-16 matrix: a few singular directions hold the energy. Sometimes it is not. This is an observation about one model and one task.
 2. Enforced while training. Never form a full $\Delta W$. Store and train only $A$ and $B$, so every step already satisfies $\mathrm{rank}(\Delta W) \le r$. This is what LoRA does. The claim is practical: training inside that thin family often reaches nearly the same task loss as updating every entry.
 
 This project does both. The rank plot is reading 1, applied to the full fine-tune. The adapter run is reading 2.
@@ -122,7 +122,7 @@ LoRA does not have to wrap every linear layer. The usual place is attention, bec
 - `v_proj`, the value
 - `o_proj`, the attention output
 
-The MLP layers stay frozen. That choice is why ${134{,}515{,}008}$ trainable numbers fall to ${921{,}600}$, about ${0.7\%}$ of the model.
+The MLP layers stay frozen. That choice is why 134,515,008 trainable numbers fall to 921,600, about 0.7% of the model.
 
 ## The worked example
 
@@ -139,8 +139,8 @@ The labels are a copy of those token ids. The model is scored on every next toke
 
 Two runs share that data and that template.
 
-- Full fine-tune. AdamW, learning rate $\eta = 5 \times 10^{-5}$, batch size ${4}$, ${3}$ epochs, sequences truncated at ${512}$ tokens. Every weight can move. Training loss by epoch: ${0.924}$, ${0.679}$, ${0.516}$.
-- LoRA. Rank $r = 8$, scale $\alpha = 16$, learning rate $\eta = 10^{-4}$, batch size ${1}$, ${3}$ epochs, on the query, key, value, and output projections. The learning rate is larger because only the thin matrices move. Training loss by epoch: ${1.082}$, ${0.973}$, ${0.920}$.
+- Full fine-tune. AdamW, learning rate $\eta = 5 \times 10^{-5}$, batch size 4, 3 epochs, sequences truncated at 512 tokens. Every weight can move. Training loss by epoch: 0.924, 0.679, 0.516.
+- LoRA. Rank $r = 8$, scale $\alpha = 16$, learning rate $\eta = 10^{-4}$, batch size 1, 3 epochs, on the query, key, value, and output projections. The learning rate is larger because only the thin matrices move. Training loss by epoch: 1.082, 0.973, 0.920.
 
 ## Technical design
 
@@ -152,19 +152,19 @@ One base model, one dataset, three services. They share the chat template and th
 
 | Service | What moves | Trainable weights | Updates / epoch | Optimizer state | Artifact | Test loss |
 | --- | --- | ---: | ---: | --- | --- | ---: |
-| Base | nothing | ${0}$ | ${0}$ | none | public checkpoint | not scored |
-| LoRA adapter | $A$ and $B$ only | ${921{,}600}$ (${0.7\%}$) | ${2{,}260}$ | AdamW on the adapter | `lora_adapters.pt` | ${1.045}$ |
-| Full fine-tune | every weight | ${134{,}515{,}008}$ | ${565}$ | AdamW on the whole model | full checkpoint | ${0.883}$ |
+| Base | nothing | 0 | 0 | none | public checkpoint | not scored |
+| LoRA adapter | $A$ and $B$ only | 921,600 (0.7%) | 2,260 | AdamW on the adapter | `lora_adapters.pt` | 1.045 |
+| Full fine-tune | every weight | 134,515,008 | 565 | AdamW on the whole model | full checkpoint | 0.883 |
 
-Float32 weights for the 135M model are about ${540\,\mathrm{MB}}$. AdamW keeps two extra copies of each trained parameter, so the full service carries roughly ${2\,\mathrm{GB}}$ of parameter state before activations. The LoRA service still loads those frozen weights, but the trained state is about ${14\,\mathrm{MB}}$: the ${921{,}600}$ adapter values, their gradients, and the two Adam moments. The full service takes fewer steps because its batch is ${4}$. Each of those steps is the expensive one.
+Float32 weights for the 135M model are about 540 MB. AdamW keeps two extra copies of each trained parameter, so the full service carries roughly 2 GB of parameter state before activations. The LoRA service still loads those frozen weights, but the trained state is about 14 MB: the 921,600 adapter values, their gradients, and the two Adam moments. The full service takes fewer steps because its batch is 4. Each of those steps is the expensive one.
 
 | | Base | LoRA | Full fine-tune |
 | --- | --- | --- | --- |
 | Learning rate | — | $\eta = 10^{-4}$ | $\eta = 5\times 10^{-5}$ |
-| Batch | — | ${1}$ | ${4}$ |
-| Epochs | — | ${3}$ | ${3}$ |
+| Batch | — | 1 | 4 |
+| Epochs | — | 3 | 3 |
 | Where it attaches | — | $W_q, W_k, W_v, W_o$ | every matrix |
-| Best when | you only need the pretrained model | you can spend a small adapter for most of the gain | you can pay for the last ${0.16}$ of test loss |
+| Best when | you only need the pretrained model | you can spend a small adapter for most of the gain | you can pay for the last 0.16 of test loss |
 
 ```mermaid
 flowchart LR
@@ -205,7 +205,7 @@ Teal is the cheap path. Rust is the expensive path. Slate is shared and not trai
 
 ## Check the idea: evaluation
 
-The review says a rank-${8}$ update can be enough. These two checks ask whether it was enough here. They answer different questions. Test loss asks whether the model predicts the reference conversations. The prompt suite asks whether a new question gets an on-topic reply. A model can improve one without fully fixing the other.
+The review says a rank-8 update can be enough. These two checks ask whether it was enough here. They answer different questions. Test loss asks whether the model predicts the reference conversations. The prompt suite asks whether a new question gets an on-topic reply. A model can improve one without fully fixing the other.
 
 ### Test loss
 
@@ -217,7 +217,7 @@ Each of the 119 test conversations goes through the same chat template as traini
 | LoRA, rank 8 | 1.045 |
 | Same LoRA adapter loaded again | 1.045 |
 
-Read the table against the review. The full update is less surprised by the reference chats. The adapter, with ${0.7\%}$ of the weights, lands about ${0.16}$ higher, and saving then reloading $A$ and $B$ reproduces that number. The loss does not say that one generated sentence is helpful. The base model was not scored this way in the saved run, so there is no third number.
+Read the table against the review. The full update is less surprised by the reference chats. The adapter, with 0.7% of the weights, lands about 0.16 higher, and saving then reloading $A$ and $B$ reproduces that number. The loss does not say that one generated sentence is helpful. The base model was not scored this way in the saved run, so there is no third number.
 
 ### Prompt suite
 
@@ -264,7 +264,7 @@ Each panel is one projection. Darker lines are earlier layers. The vertical axis
 
 ![Reconstruction error of the full fine-tune update as rank grows](assets/rank_reconstruction.png)
 
-The curves fall as $r$ grows, and they fall at different speeds. Some matrices are closer to low-rank than others. Later layers are not copies of earlier ones. That describes this full update. It does not prove that an adapter trained at $r = 8$ will match the full model. The test loss and the ${10}$ prompts are that check, and they say rank ${8}$ recovers part of the behavior, not all of it.
+The curves fall as $r$ grows, and they fall at different speeds. Some matrices are closer to low-rank than others. Later layers are not copies of earlier ones. That describes this full update. It does not prove that an adapter trained at $r = 8$ will match the full model. The test loss and the 10 prompts are that check, and they say rank 8 recovers part of the behavior, not all of it.
 
 ## Run the lesson yourself
 
