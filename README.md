@@ -11,6 +11,7 @@ After this page you should be able to:
 - Write a fine-tune as $W' = W + \Delta W$, and say what is frozen.
 - Explain $\mathrm{rank}(\Delta W)$ as the number of independent directions that update is allowed to move in.
 - Build $\Delta W$ from $A$ and $B$, including the shapes, the scale $\alpha / r$, and why $B = 0$ at the start.
+- Write the training objective as next-token cross-entropy on every token in the conversation, and say that both runs minimize that same function.
 - Read a test loss and a set of generated replies as two different checks on the same model.
 
 ## Review: fundamentals of LoRA
@@ -128,14 +129,26 @@ The MLP layers stay frozen. That choice is why 134,515,008 trainable numbers fal
 
 SmolLM2-135M was pretrained to predict the next token. It was not trained to take a user turn and answer it. On a chat prompt it usually copies the question.
 
-Instruction tuning keeps the same next-token loss and changes the text the model trains on. Each SmolTalk conversation is one string. User and assistant turns share boundary tokens:
+Instruction tuning keeps the pretraining objective and changes the text that objective is summed over. Each SmolTalk conversation is one string. User and assistant turns share boundary tokens:
 
 ```text
 <|im_start|><|user|>: hi there!<|im_end|>
 <|im_start|><|assistant|>: hi, how is it going?<|im_end|>
 ```
 
-The labels are a copy of those token ids. The model is scored on every next token, including the assistant span it is supposed to learn. The train split has 2,260 conversations. The test split has 119, and those 119 are never used to update weights.
+### The loss function
+
+The objective is next-token cross-entropy. At each position the model produces a distribution over the vocabulary, and the loss charges the log probability of the token that actually comes next:
+
+$$
+L = -\frac{1}{\lvert T \rvert}\sum_{t \in T}\log p(x_t \mid x_{\lt t}).
+$$
+
+$T$ is the set of scored positions. The label at each position is a copy of the token id, so $T$ contains every token in the formatted conversation: the user turn, the boundary tokens, and the assistant turn. Pad positions show up only when several conversations share a batch. Those positions are labeled -100 and stay out of $T$.
+
+Both the full fine-tune and the LoRA run minimize this same $L$. AdamW steps on every weight in the full run, and only on $A$ and $B$ in the LoRA run.
+
+The train split has 2,260 conversations. The test split has 119, and those 119 are never used to update weights. The training loss printed each epoch is the average of $L$ over the batches in that epoch. Inside a batch, $L$ is the mean over the real tokens, so a longer conversation contributes more tokens to that batch. The test loss later on this page is different: each of the 119 conversations is scored alone, and the reported number is the mean of those 119 values, so a short chat and a long chat count equally.
 
 Two runs share that data and that template.
 
@@ -209,7 +222,7 @@ The review says a rank-8 update can be enough. These two checks ask whether it w
 
 ### Test loss
 
-Each of the 119 test conversations goes through the same chat template as training. `labels` is a copy of the token ids, so the score is next-token cross-entropy on the whole conversation, user turns included. The batch size is 1, so padding never changes the score. The reported value is the mean of those 119 losses. Lower is better.
+Each of the 119 test conversations goes through the same chat template as training and is scored with the same $L$ defined above. The batch size is 1, so there is no padding and $T$ is the whole conversation. The reported value is the mean of those 119 losses. Lower is better.
 
 | Run | Test loss |
 | --- | ---: |
